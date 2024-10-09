@@ -65,8 +65,8 @@ export const getCart = async (req, res) => {
 export const deleteCart = async (userId) => {
     const cart = await Cart.findOneAndDelete({ userId });
     if (!cart) {
-        throw new Error('Cart not found'); 
+        console.log('Cart not found'); 
     }
-    return cart; 
+    console.log('Cart Deleted successfully');
 };
 
