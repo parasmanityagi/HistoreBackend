@@ -221,18 +221,23 @@ export const updateUser = async (req, res, next) => {
     if (req.body.number && req.body.number !== currentUser.number) {
         updates.number = req.body.number;
     }
+
     if (req.file) {
         const __filename = fileURLToPath(import.meta.url);
         const __dirname = path.dirname(__filename);
 
         const filePath = path.join(__dirname, '../uploads', currentUser.profile);
 
+        // Attempt to delete the user profile image
         fs.unlink(filePath, (err) => {
-            if (err && err.code !== 'ENOENT') {
-                return errorResponse(res, `Error removing file: ${err.message}`, 404);
+            if (err) {
+                console.error(`Error removing file: ${err.message}`);
             }
         });
-        updates.profile = req.file.path;
+
+        // Save the new profile picture path
+        updates.profile = req.file ? req.file?.filename : "";
+        
     }
 
     // If no updates are made, respond accordingly
@@ -242,8 +247,11 @@ export const updateUser = async (req, res, next) => {
 
     const user = await User.findByIdAndUpdate(req.user.id, updates, { new: true });
 
-    return successResponse(res, {}, 'User updated successfully');
+    // Respond with the updated user data, including the new profile picture path
+    return successResponse(res, user, 'User updated successfully');
 };
+
+
 
 
 
