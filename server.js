@@ -51,9 +51,9 @@ app.use('/api/cart', cartRouter);
 
 // Stripe payment endpoint
 app.post('/api/payment', async (req, res) => {
-    const { amount, currency, source } = req.body;
+    const { amount, currency, source, return_url } = req.body;
 
-    if (!amount || !currency || !source) {
+    if (!amount || !currency || !source || !return_url) {
         return res.status(400).json({ success: false, error: 'Missing required fields' });
     }
 
@@ -63,6 +63,7 @@ app.post('/api/payment', async (req, res) => {
             currency,
             payment_method: source,
             confirm: true,
+            return_url, 
         });
 
         res.status(200).json({ success: true, paymentIntent });
@@ -70,6 +71,8 @@ app.post('/api/payment', async (req, res) => {
         res.status(400).json({ success: false, error: error.message });
     }
 });
+
+
 
 
 
