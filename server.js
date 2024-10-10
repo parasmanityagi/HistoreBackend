@@ -4,7 +4,7 @@ import bodyParser from 'body-parser';
 import cors from 'cors';
 import swaggerUi from 'swagger-ui-express';
 import compression from 'compression';
-import Stripe from 'stripe';
+import stripe from 'stripe';
 
 
 import connectDB from './database/db.js';
