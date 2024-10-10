@@ -4,6 +4,7 @@ import bodyParser from 'body-parser';
 import cors from 'cors';
 import swaggerUi from 'swagger-ui-express';
 import compression from 'compression';
+import Stripe from 'stripe';
 
 
 import connectDB from './database/db.js';
@@ -42,6 +43,26 @@ app.use('/api/products/image', express.static('assets'))
 app.use('/api/user', userRouter);
 app.use('/api/products', productRouter);
 app.use('/api/cart', cartRouter);
+
+
+// Stripe payment endpoint
+app.post('/api/payment', async (req, res) => {
+    const { amount, currency, source } = req.body;
+
+    try {
+        const paymentIntent = await stripe.paymentIntents.create({
+            amount,
+            currency,
+            payment_method: source,
+            confirm: true,
+        });
+
+        res.status(200).json({ success: true, paymentIntent });
+    } catch (error) {
+        res.status(400).json({ success: false, error: error.message });
+    }
+});
+
 
 
 // Error handling middleware
