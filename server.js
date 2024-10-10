@@ -4,7 +4,7 @@ import bodyParser from 'body-parser';
 import cors from 'cors';
 import swaggerUi from 'swagger-ui-express';
 import compression from 'compression';
-import stripe from 'stripe';
+import Stripe from 'stripe';
 
 
 import connectDB from './database/db.js';
@@ -14,6 +14,10 @@ import cartRouter from './routes/cartRoute.js'
 import swaggerSpec from './swagger/swaggerConfig.js';
 
 const app = express();
+
+
+// stripe
+const stripe = new Stripe(process.env.STRIPE_SECRET_KEY);
 
 // Swagger route
 app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerSpec));
@@ -48,6 +52,10 @@ app.use('/api/cart', cartRouter);
 // Stripe payment endpoint
 app.post('/api/payment', async (req, res) => {
     const { amount, currency, source } = req.body;
+
+    if (!amount || !currency || !source) {
+        return res.status(400).json({ success: false, error: 'Missing required fields' });
+    }
 
     try {
         const paymentIntent = await stripe.paymentIntents.create({
